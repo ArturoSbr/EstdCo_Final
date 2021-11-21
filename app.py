@@ -1,17 +1,17 @@
-# Libraries
+# Importar librerías
 from flask import Flask, jsonify, request
 import pickle
 import numpy as np
 
-# Server
+# Servidor
 app = Flask(__name__)
 
-# Prueba
-@app.route('/interfaz/', methods=['GET'])
+# Probar si el servidor responde
+@app.route('/ping/', methods=['GET'])
 def ping():
-    return jsonify({'message':'pong'})
+    return jsonify({'message':'Recibí un ping. Contesto con un pong.'})
 
-# Predict requested income(s)
+# Predecir ingresos solicitados
 @app.route('/predict/', methods=['POST'])
 def predict():
     # Load model
@@ -23,18 +23,22 @@ def predict():
     # Return json
     return jsonify(y_hat)
 
-# Recalibrar modelo
+# Recibir nuevos registros, agregarlos a SQL y recalibrar el modelo
 @app.route('/recalibrate/', methods=['POST'])
 def recalibrate():
-    # Targets
-    y = np.array([d['ingreso'] for d in request.json])
-    print('\nA columna de target:\n', y)
-    # Features
-    X = np.array([list(d.values())[1:] for d in request.json])
-    print('\nA columnas de features:\n', X)
-    # hola
+    # Cargar solicitud como lista de listas
+    new = [list(d.values()) for d in request.json]
+    print(new)
+    # # Subir cada registro a SQL
+    # for reg in new:
+    #     sql.upload(reg)
     # Return success message
-    return jsonify({'message':'recibí solicitud'})
+    return jsonify(
+        {
+            'message':'Recibí nuevos registros.',
+            'to-do':'Subir los nuevos registros a SQL, bajar todos los registros a memoria y volver a ajustar el modelo.'
+        }
+    )
     
 
 # Correr app cuando se ejecuta el script
